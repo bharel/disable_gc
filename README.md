@@ -13,3 +13,6 @@ Safe for use inside finalizers.
     @disable_gc
     def func():
         a = 1  # GC disabled inside the function.
+
+# Notes
+Can be used as a reference for [bpo-31356](https://bugs.python.org/issue31356).
