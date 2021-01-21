@@ -30,7 +30,6 @@ class _GC(_ContextDecorator, _AbstractContextManager):
     def __init__(self):
         self._lock = _RLock()  # RLock is a must for finalizer use.
         self._counter = 0
-        self._manual_collections = 0
 
     # Order is important throughout the function if GC reenters it.
     def __enter__(self, *, _gc=_gc, _getcount=_gc.get_count):
@@ -40,17 +39,19 @@ class _GC(_ContextDecorator, _AbstractContextManager):
             # Disable if enabled (maybe from outside threads), otherwise no-op.
             _gc.disable()
 
-            # Prevent GC starvation (gen1, gen2, internal tree cleanup).
-            # Acts globally so do it sparingly according to gen1 threshold.
-            if self._manual_collections > _gen1_collection_threshold:
-                self._manual_collections = 0
-                _gc.enable()
-                _gc.disable()
+            gen0, gen1, _ = _getcount()
 
             # Collect gen0 once per entry if needed.
-            elif _getcount[0] > _gen0_collection_threshold:
-                self._manual_collections += 1
-                _gc.collect(0)
+            if gen0 > _gen0_collection_threshold:
+                # Prevent GC starvation (gen1, gen2, internal LL cleanup).
+                # Acts globally so do it sparingly according to gen1 threshold.
+                if gen1 > _gen1_collection_threshold:
+                    # Force GC collecion.
+                    _gc.enable()
+                    (lambda: None)()  # Run GC.
+                    _gc.disable()
+                else:
+                    _gc.collect(0)
 
         return super().__enter__()
 
@@ -59,7 +60,6 @@ class _GC(_ContextDecorator, _AbstractContextManager):
         with self._lock:
             self._counter -= 1
             if self._counter == 0:
-                self._manual_collections = 0
                 _gc.enable()
         return super().__exit__(exc_type, exc_value, traceback)
 
