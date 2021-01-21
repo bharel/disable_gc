@@ -132,7 +132,7 @@ class TestDisableGC(TestCase):
         Periodic clear is important to keep RAM usage sane.
         """
         gc.collect(0)
-        allocated = [[] for i in range(130)]  # noqa
+        allocated = [[] for i in range(300)]  # noqa
 
         self.assertGreater(_gen(0), 100)
         with disable_gc:
