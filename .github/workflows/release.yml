@@ -17,7 +17,7 @@ jobs:
         run: |
           PY_VER=$(python -c "import disable_gc;print(disable_gc.__version__)")
           echo Python version - "$PY_VER"
-          SETUP_VER=$(awk "/version =/ { print $3 }")
+          SETUP_VER=$(awk "/version =/ { print \$3 }" setup.cfg)
           echo Setup.cfg version - "$SETUP_VER"
           [[ $PY_VER == $SETUP_VER ]]
           TAG_VER=${${{ github.event.release.tag_name }}:1}
