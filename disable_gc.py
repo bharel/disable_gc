@@ -4,7 +4,7 @@ from threading import RLock as _RLock
 import gc as _gc
 
 __author__ = "Bar Harel"
-__version__ = "0.1.0"
+__version__ = "0.0.2"
 __license__ = "MIT License"
 __all__ = ["disable_gc"]
 
