@@ -3,9 +3,10 @@ disable\_gc
 
 Python context manager for temporarily disabling the garbage collector.
 
-| Reentrant, threadsafe, safe for use in asyncio, and prevents GC
+Reentrant, threadsafe, safe for use in asyncio, and prevents GC
 starvation.
-| Safe for use inside finalizers.
+
+Safe for use inside finalizers.
 
 Usage
 =====
